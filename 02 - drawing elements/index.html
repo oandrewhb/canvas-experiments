@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Resize</title>
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas></canvas>
+    <script>
+        const canvas = document.querySelector('canvas')
+        canvas.width = window.innerWidth
+        canvas.height = window.innerHeight
+
+        const context = canvas.getContext('2d')
+
+        context.fillStyle = 'green'
+        context.fillRect(100, 100, 100, 100)
+        context.fillStyle = 'red'
+        context.fillRect(400, 100, 100, 100)
+        context.fillStyle = 'yellow'
+        context.fillRect(300, 300, 100, 100)
+        
+        // Line
+        context.beginPath()
+        context.moveTo(50, 300)
+        context.lineTo(300, 100)
+        context.lineTo(400, 300)
+        context.strokeStyle = 'blue'
+        context.stroke()
+
+        // Arc / Circle
+        context.fillStyle = 'gray'
+        context.fillRect(230-60, 500-60, 60, 60)
+        context.fillStyle = 'lightgray'
+        context.fillRect(230, 500-60, 60, 60)
+        context.fillStyle = 'lightgray'
+        context.fillRect(230-60, 500, 60, 60)
+        context.fillStyle = 'gray'
+        context.fillRect(230, 500, 60, 60)
+        
+        context.strokeStyle = 'red'
+        context.beginPath()
+        context.arc(
+            230,            // coordenada X do centro do circulo
+            500,            // coordenada Y do centro do circulo
+            60,             // raio
+            0,              // ângulo inicial em radianos
+            Math.PI * 2,    // ângulo final em radianos
+            false           // sentido horário
+        )
+
+        // 0             = lado direito do cirulo
+        // Math.PI * 0.5 = lado de baixo
+        // Math.PI * 1   = lado esquerto
+        // Math.PI * 1.5 = lado de cima
+        // Math.PI * 2   = lado de direito (depois de uma volta completa)
+        context.stroke()
+
+        // Um monte de circulos
+        for (let i = 0; i<=100; i+= 2) {
+            context.beginPath()
+            context.arc(200+i, 650+i, 60+i, 0, Math.PI * 2, false)
+            context.stroke()
+        }
+    </script>
+</body>
+</html>
