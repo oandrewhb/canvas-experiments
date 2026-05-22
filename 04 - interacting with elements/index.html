@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Resize</title>
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas></canvas>
+    <script>
+
+        const canvas = document.querySelector('canvas')
+        canvas.width = window.innerWidth
+        canvas.height = window.innerHeight
+
+        const context = canvas.getContext('2d')
+
+        const circles = []
+        const mouse = {}
+
+        window.addEventListener('mousemove', (event) => {
+            mouse.x = event.x
+            mouse.y = event.y
+        })
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth
+            canvas.height = window.innerHeight
+        })
+
+        for (let i = 0; i < 300; i++) {
+            spawnCircle()
+        }
+        animate()
+
+        function spawnCircle(x, y) {
+            const defaultSpeed = 0.5
+            const maxRadius = 60
+            const minRadius = 5
+            const radius = 30
+            const diameter = radius * 2
+            const margin = 60
+
+            const colors = ['gray', 'black', 'blue']
+
+            circles.push({
+                color: colors[Math.floor(Math.random() * colors.length)],
+                maxRadius: maxRadius,
+                minRadius: minRadius,
+                radius: radius,
+                positionX: x != undefined ? x : Math.floor(Math.random() * (canvas.width - diameter)) + diameter,
+                positionY: y != undefined ? x : Math.floor(Math.random() * (canvas.height - diameter)) + diameter,
+                speedX: Math.random() < 0.5 ? defaultSpeed : -defaultSpeed,
+                speedY: Math.random() < 0.5 ? defaultSpeed : -defaultSpeed,
+                get leftBorder() {
+                    return this.positionX - this.radius
+                },
+                get rightBorder() {
+                    return this.positionX + this.radius
+                },
+                get topBorder() {
+                    return this.positionY - this.radius
+                },
+                get bottomBorder() {
+                    return this.positionY + this.radius
+                },
+                get leftBorderWithMargin() {
+                    return this.leftBorder - margin
+                },
+                get rightBorderWithMargin() {
+                    return this.rightBorder + margin
+                },
+                get topBorderWithMargin() {
+                    return this.topBorder - margin
+                },
+                get bottomBorderWithMargin() {
+                    return this.bottomBorder + margin
+                },
+            })
+        }
+
+        function animate() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (const circle of circles) {
+                updateCircle(circle)
+            }
+
+            for (const circle of circles) {
+                drawCircle(circle)
+            }
+
+            drawSquare()
+
+            requestAnimationFrame(animate)
+        }
+
+        function updateCircle(circle) {
+            const leftBorder = 0
+            const rightBorder = canvas.width
+            const topBorder = 0
+            const bottomBorder = canvas.height
+
+            if (circle.leftBorder <= leftBorder || circle.rightBorder >= rightBorder) {
+                circle.speedX = -circle.speedX
+            }
+
+            if (circle.topBorder <= topBorder || circle.bottomBorder >= bottomBorder) {
+                circle.speedY = -circle.speedY
+            }
+
+            circle.positionX += circle.speedX
+            circle.positionY += circle.speedY
+
+            if (isMouseOverTheCircle(circle) && circle.radius < circle.maxRadius) {
+                circle.radius += 0.9
+            } else if (circle.radius > circle.minRadius) {
+                circle.radius -= 0.9
+            }
+        }
+
+        function isMouseOverTheCircle(circle) {
+            return mouse.x >= circle.leftBorderWithMargin
+                && mouse.x <= circle.rightBorderWithMargin
+                && mouse.y >= circle.topBorderWithMargin
+                && mouse.y <= circle.bottomBorderWithMargin
+        }
+
+        function drawCircle(circle) {
+            context.fillStyle = circle.color
+            context.strokeStyle = circle.color
+            context.beginPath()
+            context.arc(circle.positionX, circle.positionY, circle.radius, 0, Math.PI * 2, false)
+            context.stroke()
+            context.fill()
+        }
+
+        function drawSquare() {
+            context.fillStyle = mouse.shiftKey ? 'blue' : 'red'
+            context.fillRect(mouse.x - 10, mouse.y - 10, 20, 20)
+        }
+
+    </script>
+</body>
+</html>
