@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Resize</title>
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas></canvas>
+    <script>
+        const canvas = document.querySelector('canvas')
+        canvas.width = window.innerWidth
+        canvas.height = window.innerHeight
+
+        const context = canvas.getContext('2d')
+
+        const circles = []
+
+        for (let i = 0; i < 50; i++) {
+            spawnCircle()
+        }
+        animate()
+
+        function spawnCircle(x, y) {
+            const defaultSpeed = Math.floor(Math.random() * 4) + 1 // 1 a 4
+            const radius = 30
+            const diameter = radius * 2
+            circles.push({
+                radius: radius,
+                positionX: x != undefined ? x : Math.floor(Math.random() * (canvas.width - diameter)) + diameter,
+                positionY: y != undefined ? x : Math.floor(Math.random() * (canvas.height - diameter)) + diameter,
+                speedX: Math.random() < 0.5 ? defaultSpeed : -defaultSpeed,
+                speedY: Math.random() < 0.5 ? defaultSpeed : -defaultSpeed,
+                get leftBorder() {
+                    return this.positionX - this.radius
+                },
+                get rightBorder() {
+                    return this.positionX + this.radius
+                },
+                get topBorder() {
+                    return this.positionY - this.radius
+                },
+                get bottomBorder() {
+                    return this.positionY + this.radius
+                },
+            })
+        }
+
+        function animate() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (const circle of circles) {
+                updateCircle(circle)
+            }
+
+            for (const circle of circles) {
+                drawCircle(circle)
+            }
+
+            requestAnimationFrame(animate)
+        }
+
+        function updateCircle(circle) {
+            const leftBorder = 0
+            const rightBorder = canvas.width
+            const topBorder = 0
+            const bottomBorder = canvas.height
+
+            if (circle.leftBorder <= leftBorder || circle.rightBorder >= rightBorder) {
+                circle.speedX = -circle.speedX
+            }
+
+            if (circle.topBorder <= topBorder || circle.bottomBorder >= bottomBorder) {
+                circle.speedY = -circle.speedY
+            }
+
+            circle.positionX += circle.speedX
+            circle.positionY += circle.speedY
+        }
+
+        function drawCircle(circle) {
+            context.strokeStyle = 'blue'
+            context.fillStyle = 'lightblue'
+            context.beginPath()
+            context.arc(circle.positionX, circle.positionY, circle.radius, 0, Math.PI * 2, false)
+            context.stroke()
+            context.fill()
+        }
+
+    </script>
+</body>
+</html>
